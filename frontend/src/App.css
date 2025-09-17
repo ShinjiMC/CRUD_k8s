@@ -1,0 +1,139 @@
+/* ===== Reset básico ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background-color: #1e1e1e; /* fondo oscuro principal */
+  color: #e4e4e4; /* texto base claro */
+  min-height: 100vh;
+}
+
+/* ===== Layout general ===== */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #c5c5ff; /* morado claro */
+}
+
+/* ===== Tarjeta de formulario ===== */
+.card {
+  background: #2a2a2a; /* gris oscuro */
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  margin-bottom: 40px;
+}
+
+.card-title {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: #bdbdff;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input {
+  padding: 12px 14px;
+  border: 1px solid #4f46e5; /* borde morado */
+  background: #1e1e1e;
+  color: #e4e4e4;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #7c74ff;
+  box-shadow: 0 0 0 2px rgba(124, 116, 255, 0.4);
+}
+
+/* ===== Botones ===== */
+.btn {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-add {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.btn-add:hover {
+  background: #4338ca;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}
+
+/* ===== Tabla ===== */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  color: #e4e4e4;
+}
+
+.table th,
+.table td {
+  padding: 14px 16px;
+  border: 1px solid #3a3a3a;
+  text-align: left;
+}
+
+.table th {
+  background: #4f46e5; /* morado principal */
+  color: #fff;
+  font-weight: 600;
+}
+
+.table tr.even {
+  background: #2f2f2f; /* filas alternadas */
+}
+
+.table tr.odd {
+  background: #262626;
+}
+
+.center {
+  text-align: center;
+}
+
+/* ===== Footer ===== */
+.footer {
+  margin-top: 40px;
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
