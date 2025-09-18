@@ -124,128 +124,12 @@ docker push <user>/my-frontend:latest
 
 Todos los archivos de configuración YAML se encuentran en la carpeta `k8s/`. Y estos son los archivos:
 
-#### `k8s/backend-deployment.yaml`
-
-Se definen **dos recursos**:
-
-1. **Deployment**: despliega el contenedor del backend.
-
-- **replicas: 1**: lanza una sola réplica del backend.
-- **image**: usa la imagen Docker publicada en `shinjimc/my-backend:latest`.
-- **env**: define la variable `MONGO_URI` para conectarse a MongoDB.
-- **containerPort 4000**: el contenedor escucha en el puerto 4000.
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backend
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: backend
-  template:
-    metadata:
-      labels:
-        app: backend
-    spec:
-      containers:
-        - name: backend
-          image: shinjimc/my-backend:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 4000
-          env:
-            - name: MONGO_URI
-              value: mongodb://admin:adminpass@mongo:27017/test?authSource=admin
-```
-
-2. **Service**: expone el backend hacia el exterior.
-
-- **type: NodePort**: permite el acceso desde fuera del clúster.
-- **nodePort 32000**: el backend será accesible desde `<IP_del_nodo>:32000`.
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend
-spec:
-  type: NodePort
-  selector:
-    app: backend
-  ports:
-    - protocol: TCP
-      port: 4000
-      targetPort: 4000
-      nodePort: 32000
-```
-
----
-
-#### `k8s/frontend-deployment.yaml`
-
-Se definen **dos recursos**:
-
-1. **Deployment**: despliega el contenedor del frontend.
-
-- Despliega una réplica del contenedor Nginx que sirve en el puerto 80.
-- Usa la imagen `my-frontend:latest` generada previamente.
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      labels:
-        app: frontend
-    spec:
-      containers:
-        - name: frontend
-          image: my-frontend:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 80
-```
-
-2. **Service**: expone el frontend hacia el exterior.
-
-- **type: NodePort**: expone el frontend fuera del clúster.
-- **nodePort 30080**: el sitio web será accesible desde `<IP_del_nodo>:30080`.
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend
-spec:
-  type: NodePort
-  selector:
-    app: frontend
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 30080
-```
-
----
-
 #### `k8s/mongo-deployment.yaml`
 
 Se definen **tres recursos**:
 
-1. **PersistentVolumeClaim (PVC)**: para almacenar los datos de MongoDB de manera persistente.
-
-- Reserva 1 GiB de almacenamiento persistente para la base de datos.
+1. **PersistentVolumeClaim (PVC)** – Almacenamiento persistente
+   Reserva **1 GiB** para que los datos de MongoDB no se pierdan si el pod se reinicia.
 
 ```yaml
 apiVersion: v1
@@ -260,10 +144,11 @@ spec:
       storage: 1Gi
 ```
 
-2. **Deployment**: despliega el contenedor de MongoDB.
+2. **Deployment** – Contenedor de MongoDB
 
-- Despliega MongoDB versión 6.0 con credenciales de administrador (`admin` / `adminpass`).
-- **volumeMounts**: monta el volumen persistente en `/data/db` para conservar los datos.
+   - Imagen oficial `mongo:6.0`.
+   - Variables de entorno `MONGO_INITDB_ROOT_USERNAME` y `MONGO_INITDB_ROOT_PASSWORD` crean el usuario **admin** con contraseña **adminpass**.
+   - Monta el volumen persistente en `/data/db`.
 
 ```yaml
 apiVersion: apps/v1
@@ -299,9 +184,8 @@ spec:
             claimName: mongo-pvc
 ```
 
-3. **Service**: permite la comunicación interna dentro del clúster.
-
-- Expone MongoDB **solo dentro del clúster**, para que el backend pueda conectarse.
+3. **Service** – Comunicación interna
+   Expone MongoDB solo **dentro del clúster** para que el backend lo resuelva por DNS con el nombre `mongo` en el puerto **27017**.
 
 ```yaml
 apiVersion: v1
@@ -315,6 +199,125 @@ spec:
     - protocol: TCP
       port: 27017
       targetPort: 27017
+```
+
+---
+
+### `k8s/backend-deployment.yaml`
+
+El backend se conecta a MongoDB para leer y escribir datos.
+Aquí se aprovecha el _Service_ `mongo` definido antes.
+
+Se definen **dos recursos**:
+
+1. **Deployment** – Contenedor del backend
+
+   - Imagen `shinjimc/my-backend:latest`.
+   - Variable `MONGO_URI` apunta al hostname **mongo** del Service de la base de datos
+   - Expone el puerto interno **4000**.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: shinjimc/my-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4000
+          env:
+            - name: MONGO_URI
+              value: mongodb://admin:adminpass@mongo:27017/test?authSource=admin
+```
+
+2. **Service** – Exposición externa
+
+   - Tipo `NodePort` para que clientes fuera del clúster (incluido el frontend) puedan acceder.
+   - Disponible en `<IP_del_nodo>:32000`.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 4000
+      targetPort: 4000
+      nodePort: 32000
+```
+
+---
+
+### `k8s/frontend-deployment.yaml`
+
+El frontend es un sitio estático servido por Nginx que consume la API del backend (`http://<IP_del_nodo>:32000/items`).
+
+Se definen **dos recursos**:
+
+1. **Deployment** – Contenedor del frontend
+
+   - Imagen `my-frontend:latest`.
+   - Sirve los archivos en el puerto **80**.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: my-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+```
+
+2. **Service** – Exposición externa
+
+   - Tipo `NodePort` para que los usuarios accedan desde su navegador.
+   - Disponible en `<IP_del_nodo>:30080`.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
 ```
 
 ---
