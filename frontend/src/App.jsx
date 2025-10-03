@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API = "http://localhost:4000/items"; // CRUD (MongoDB)
-const SEARCH_API = "http://localhost:4001/search"; // Búsqueda (Elasticsearch)
+const API = "http://backend:4000/items"; // CRUD (MongoDB)
+const SEARCH_API = "http://data-service:4001"; // Búsqueda (Elasticsearch)
 
 function App() {
   const [items, setItems] = useState([]);
@@ -29,7 +29,7 @@ function App() {
     }
     setLoading(true);
     try {
-      const res = await axios.get(`${SEARCH_API}?q=${query}`);
+      const res = await axios.get(`${SEARCH_API}/search?q=${query}`);
       const products = res.data.map((hit) => ({
         _id: hit._id,
         ...hit._source,
@@ -46,7 +46,7 @@ function App() {
     if (!form.name || !form.price) return;
     try {
       const { data } = await axios.post(API, form); // primero Mongo
-      await axios.post("http://localhost:4001/index-product", data); // luego Elastic
+      await axios.post(`${SEARCH_API}/index-product`, data); // luego Elastic
       setForm({ name: "", price: "" });
       load();
     } catch (err) {
@@ -57,7 +57,7 @@ function App() {
   const remove = async (id) => {
     try {
       await axios.delete(`${API}/${id}`); // primero Mongo
-      await axios.delete(`http://localhost:4001/items/${id}`); // luego Elastic
+      await axios.delete(`${SEARCH_API}/items/${id}`); // luego Elastic
       load();
     } catch (err) {
       console.error(err);

@@ -25,7 +25,7 @@ spec:
       containers:
         - name: frontend
           image: shinjimc/frontend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
 ---
