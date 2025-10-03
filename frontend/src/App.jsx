@@ -30,10 +30,14 @@ function App() {
     setLoading(true);
     try {
       const res = await axios.get(`${SEARCH_API}/search?q=${query}`);
+
+      // Verifica si hay _source, si no, usamos hit directo
       const products = res.data.map((hit) => ({
         _id: hit._id,
-        ...hit._source,
+        name: hit._source?.name || hit.name,
+        price: hit._source?.price || hit.price,
       }));
+
       setItems(products);
     } catch (err) {
       console.error(err);
