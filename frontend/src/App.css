@@ -137,3 +137,58 @@ body {
   font-size: 0.95rem;
   color: #b0b0b0;
 }
+
+/* ===== Buscador estilo Google ===== */
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+  border: 2px solid #4f46e5; /* borde morado */
+  border-radius: 30px;
+  padding: 10px 16px;
+  background: #2a2a2a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  padding: 8px;
+  background: transparent;
+  color: #e4e4e4;
+}
+
+.search-input::placeholder {
+  color: #9a9a9a;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 8px;
+  color: #c5c5ff; /* morado claro */
+  transition: color 0.2s;
+}
+
+.icon-btn:hover {
+  color: #7c74ff;
+}
+
+.icon-btn.clear {
+  color: #ef4444; /* rojo para la X */
+}
+
+.icon-btn.clear:hover {
+  color: #dc2626;
+}
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}

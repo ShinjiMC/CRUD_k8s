@@ -357,3 +357,151 @@ Podrás interactuar con el CRUD de productos desde tu navegador:
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+sudo dnf install VirtualBox
+
+sudo swapoff -a
+sudo nano /etc/fstab
+![Comentar swapoff](image.png)
+cat /proc/swaps
+
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y containerd
+
+# 4️⃣ Generar configuración por defecto de containerd
+
+sudo mkdir -p /etc/containerd
+sudo containerd config default | sudo tee /etc/containerd/config.toml
+
+# 5️⃣ Activar systemd cgroups en containerd
+
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+
+# 6️⃣ Reiniciar y habilitar containerd
+
+sudo systemctl restart containerd
+sudo systemctl enable containerd
+sudo systemctl status containerd
+
+# 7️⃣ Verificar versión de containerd
+
+containerd --version
+
+# Agregar repo
+
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+# Instalar paquetes
+
+sudo apt update
+sudo apt install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
+# Verificar versiones
+
+kubeadm version
+kubectl version --client
+kubelet --version
+
+![verificacion](image-1.png)
+
+# Habilitar los módulos y parámetros de kernel requeridos:
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+# Persistir configuración
+
+sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+sudo sysctl --system
+
+# ACA CON MASTER
+sudo kubeadm init \
+  --apiserver-advertise-address=192.168.56.102 \
+  --pod-network-cidr=10.244.0.0/16
+
+![init](image-2.png)
+guardamos el join para los workers:
+![join que genera](image-3.png)
+
+# Configurar kubectl en el master
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl get nodes
+
+![nodos not ready master](image-4.png)
+
+# Instalar un CNI (Flannel)
+
+El CNI (Flannel) se instala en el master y automáticamente configura la red para todo el cluster, de manera que los workers también puedan comunicarse correctamente.
+
+kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter.yaml
+kubectl get nodes
+kubectl get pods -n kube-flannel
+kubectl get nodes
+
+![flannel](image-5.png)
+
+# Unir workers
+
+Ejecutamos el join que recibimos del kubeadm
+![Union de worker1](image-6.png)
+
+sudo kubeadm join 192.168.56.102:6443 --token i6h2ml.wuoeun76az7kl1r2 \
+        --discovery-token-ca-cert-hash sha256:0cddb932c7389f807681a3b3cb4a33edb7d3b29cd1bde0eb08778a95211f20c3 
+
+![nodes ya conectados](image-7.png)
+
+
+# pa prdener los nodos
+
+Esto creará pods kube-flannel en todos los nodos.
+
+kubectl get pods -n kube-system
+kubectl get nodes
+
+![ready todos](image-8.png)
+
+
+# probar un nginx
+
+kubectl create deployment nginx-test --image=nginx
+kubectl expose deployment nginx-test --type=NodePort --port=80
+kubectl get services
+
+sudo ufw allow 30576/tcp
+sudo ufw reload
+
+
+# Cargar proyecto
+
+Entra a uno de los pods de MongoDB (por ejemplo mongo-0):
+
+kubectl exec -it mongo-0 -- mongosh -u admin -p adminpass
+
+
+Dentro del shell de Mongo, ejecuta:
+
+rs.initiate({
+  _id: "rs0",
+  members: [
+    { _id: 0, host: "mongo-0.mongo:27017" },
+    { _id: 1, host: "mongo-1.mongo:27017" },
+    { _id: 2, host: "mongo-2.mongo:27017" }
+  ]
+})
+
+
+Verifica el estado del ReplicaSet:
+
+rs.status()

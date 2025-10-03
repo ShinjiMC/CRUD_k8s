@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: frontend
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: my-frontend:latest
+          image: shinjimc/frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
