@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: shinjimc/my-backend:latest
+          image: shinjimc/backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4000
