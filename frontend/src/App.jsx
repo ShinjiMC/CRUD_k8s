@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 
 const API = "http://192.168.56.102:32000/items"; // CRUD (MongoDB)
-const SEARCH_API = "http://192.168.56.102:32001"; // Búsqueda (Elasticsearch)
+const SEARCH_API = "http://192.168.56.102:32001"; // Búsqueda
 
 function App() {
   const [items, setItems] = useState([]);
@@ -45,8 +45,7 @@ function App() {
   const add = async () => {
     if (!form.name || !form.price) return;
     try {
-      const { data } = await axios.post(API, form); // primero Mongo
-      await axios.post(`${SEARCH_API}/index-product`, data); // luego Elastic
+      await axios.post(API, form); // primero Mongo
       setForm({ name: "", price: "" });
       load();
     } catch (err) {
@@ -57,7 +56,6 @@ function App() {
   const remove = async (id) => {
     try {
       await axios.delete(`${API}/${id}`); // primero Mongo
-      await axios.delete(`${SEARCH_API}/items/${id}`); // luego Elastic
       load();
     } catch (err) {
       console.error(err);

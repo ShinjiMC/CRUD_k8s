@@ -5,10 +5,16 @@
   "scripts": {
     "start": "node server.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "@elastic/elasticsearch": "^8.10.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "body-parser": "^2.2.0",
+    "mongoose": "^8.18.1"
   }
 }
