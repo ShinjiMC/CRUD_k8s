@@ -30,7 +30,7 @@ spec:
             - containerPort: 4001
           env:
             - name: MONGO_URI
-              value: mongodb://admin:adminpass@mongo-service:27017/test?authSource=admin
+              value: mongodb://mongo:VMBoSXotYMaVvFSsYxDyulEAVmArGrlM@hopper.proxy.rlwy.net:53449/test?authSource=admin
 ---
 apiVersion: v1
 kind: Service

@@ -490,23 +490,6 @@ git clone al repo
 luego en master entrar a la carpeta k8s y 
 
 
-Entra a uno de los pods de MongoDB (por ejemplo mongo-0):
-
-kubectl exec -it mongo-0 -- mongosh -u admin -p adminpass
 
 
-Dentro del shell de Mongo, ejecuta:
-
-rs.initiate({
-  _id: "rs0",
-  members: [
-    { _id: 0, host: "mongo-0.mongo:27017" },
-    { _id: 1, host: "mongo-1.mongo:27017" },
-    { _id: 2, host: "mongo-2.mongo:27017" }
-  ]
-})
-
-
-Verifica el estado del ReplicaSet:
-
-rs.status()
+![apply a todo](image-9.png)
