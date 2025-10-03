@@ -30,7 +30,7 @@ spec:
             - containerPort: 4000
           env:
             - name: MONGO_URI
-              value: mongodb://admin:adminpass@mongo:27017/test?authSource=admin
+              value: mongodb://admin:adminpass@mongo-service:27017/test?authSource=admin
 ---
 apiVersion: v1
 kind: Service

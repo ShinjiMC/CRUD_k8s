@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API = "http://backend:4000/items"; // CRUD (MongoDB)
-const SEARCH_API = "http://data-service:4001"; // Búsqueda (Elasticsearch)
+const API = "http://backend:32000/items"; // CRUD (MongoDB)
+const SEARCH_API = "http://data-service:32001"; // Búsqueda (Elasticsearch)
 
 function App() {
   const [items, setItems] = useState([]);
