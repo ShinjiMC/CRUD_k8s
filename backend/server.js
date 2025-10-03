@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose"); // o mysql2
-require("dotenv").config();
 
 const app = express();
 app.use(cors());

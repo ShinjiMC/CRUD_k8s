@@ -25,7 +25,7 @@ spec:
       containers:
         - name: data-service
           image: shinjimc/data-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 4001
           env:

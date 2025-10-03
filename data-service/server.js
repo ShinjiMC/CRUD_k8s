@@ -1,14 +1,15 @@
 const express = require("express");
 const { Client } = require("@elastic/elasticsearch");
 const cors = require("cors");
-require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // Conexión a Elasticsearch
-const es = new Client({ node: process.env.ES_NODE || "http://localhost:9200" });
+const es = new Client({
+  node: process.env.ES_NODE || "http://elasticsearch:9200",
+});
 
 // Indexar producto en Elastic
 app.post("/index-product", async (req, res) => {
