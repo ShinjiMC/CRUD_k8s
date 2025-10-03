@@ -12,6 +12,16 @@ spec:
       labels:
         app: data-service
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - data-service
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: data-service
           image: shinjimc/data-service:latest

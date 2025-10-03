@@ -485,6 +485,11 @@ sudo ufw reload
 
 # Cargar proyecto
 
+git clone al repo
+
+luego en master entrar a la carpeta k8s y 
+
+
 Entra a uno de los pods de MongoDB (por ejemplo mongo-0):
 
 kubectl exec -it mongo-0 -- mongosh -u admin -p adminpass

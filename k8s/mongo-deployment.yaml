@@ -29,6 +29,16 @@ spec:
       labels:
         app: mongo
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - mongo
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: mongo
           image: mongo:6.0
