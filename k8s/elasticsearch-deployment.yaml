@@ -23,6 +23,12 @@ spec:
               value: "-Xms512m -Xmx512m"
           ports:
             - containerPort: 9200
+          readinessProbe: # <-- aquí lo agregas
+            httpGet:
+              path: /
+              port: 9200
+            initialDelaySeconds: 30
+            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
